@@ -125,12 +125,13 @@ public class InjuredRagdoll : Script
                 speechparamsarmor = "\"" + speechparamsarmorz + "\"";
             }
 
-        //AntiSpam options grab
+        /*//AntiSpam options grab
             if (antispamhealth || antispamarmor)
             {
                 antispamtimehe = 100 * config.GetValue<int>("RAGDOLLTIME", "AntiSpamTimeHealth", 3);
                 antispamtimear = 100 * config.GetValue<int>("RAGDOLLTIME", "AntiSpamTimeArmor", 3);
             }
+        */
 
         //Debug when the script starts running
             if (debug)
@@ -262,7 +263,7 @@ public class InjuredRagdoll : Script
                     }
                     if (antispamhealth)
                     {
-                        Wait(antispamtimehe);
+                        Wait(antispamtimehe * 1000);
                     }
                 }
                 //Special ragdoll in Vehicle for health
@@ -309,7 +310,7 @@ public class InjuredRagdoll : Script
                     }
                     if (antispamarmor)
                     {
-                        Wait(antispamtimear);
+                        Wait(antispamtimear * 1000);
                     }
                 }
                 //Special ragdoll in Vehicle for armor
