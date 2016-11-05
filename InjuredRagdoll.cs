@@ -7,65 +7,23 @@ public class InjuredRagdoll : Script
 {
     private ScriptSettings config;
     //Public strings, bools and ints
-        bool activatehealthragdoll;
-        bool activatearmorragdoll;
-        bool activatecoverhealthragdoll;
-        bool activatecoverarmorragdoll;
-        bool activatehealthvehicleragdoll;
-        bool activatearmorvehicleragdoll;
-        bool debug;
-        int ragdollcount;
-        int ragdollvehiclecount;
-        int ragdolltimehealth;
-        int ragdolltimearmor;
-        int ragdolltypehealth;
-        int ragdolltypearmor;
-        int ragdolltimehe;
-        int ragdolltimear;
-        int ragdolltimehelong;
-        int ragdolltimearlong;
-        bool antispamhealth;
-        bool antispamarmor;
-        int antispamtimehe;
-        int antispamtimehelong;
-        int antispamtimear;
-        int antispamtimearlong;
-        bool randomizehealthtime;
-        bool randomizearmortime;
-        bool randomizehealthanim;
-        bool randomizearmoranim;
-        int minrandomhealthtime;
-        int maxrandomhealthtime;
-        int minrandomarmortime;
-        int maxrandomarmortime;
-        bool screamhealth;
-        bool screamarmor;
-        int screamtypehealth;
-        int screamtypearmor;
-        bool speechhealth;
-        bool speecharmor;
-        string speechtypehealth;
-        string speechtypearmor;
-        string speechparamshealth;
-        string speechparamsarmor;
-        string speechtypehealthz;
-        string speechtypearmorz;
-        string speechparamshealthz;
-        string speechparamsarmorz;
-
-        Random r = new Random();
+        private bool activatehealthragdoll, activatearmorragdoll, activatecoverhealthragdoll, activatecoverarmorragdoll, activatehealthvehicleragdoll, activatearmorvehicleragdoll, debug, antispamhealth, antispamarmor, randomizehealthtime, randomizearmortime, randomizehealthanim, randomizearmoranim, screamhealth, screamarmor, speechhealth, speecharmor, improved;
+        private int ragdollvehiclecount, ragdolltimehealth, ragdolltimearmor, ragdolltypehealth, ragdolltypearmor, ragdolltimehe, ragdolltimear, ragdolltimehelong, ragdolltimearlong, antispamtimehe, antispamtimear, ragdollcount, minrandomhealthtime, maxrandomhealthtime, minrandomarmortime, maxrandomarmortime, screamtypehealth, screamtypearmor;
+	    private string speechtypehealth, speechtypearmor, speechparamshealth, speechparamsarmor, speechtypehealthz, speechtypearmorz, speechparamshealthz, speechparamsarmorz;
+        private Random r = new Random();
 
     public InjuredRagdoll()
     {
         Tick += OnTick;
-        Interval = 10;
+        //Interval = 10;
 
         //Grab configs from the INI
             config = ScriptSettings.Load("scripts\\InjuredRagdoll.ini");
 
             activatehealthragdoll = config.GetValue<bool>("ACTIVATERAGDOLL", "HealthRagdoll", true);
             activatearmorragdoll = config.GetValue<bool>("ACTIVATERAGDOLL", "ArmorRagdoll", true);
-            debug = config.GetValue<bool>("ACTIVATERAGDOLL", "Debug", false);
+            debug = config.GetValue<bool>("DEBUG", "Debug", false);
+            improved = config.GetValue<bool>("ACTIVATERAGDOLL", "WeaponOnly", true);
 
             activatecoverhealthragdoll = config.GetValue<bool>("ACTIVATERAGDOLL", "InCoverHealthRagdoll", true);
             activatecoverarmorragdoll = config.GetValue<bool>("ACTIVATERAGDOLL", "InCoverArmorRagdoll", true);
@@ -184,19 +142,27 @@ public class InjuredRagdoll : Script
             //Hit detection
                 bool ishealthreduced = false;
                 bool isarmorreduced = false;
-                
-                Wait(200);
-                if (health > player.Health)
+
+            Wait(200);
+            if (improved) { //Improved Detection
+                if (health > player.Health && !GTA.Native.Function.Call<bool>(GTA.Native.Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, player, 0, 1))
                 {
                     ishealthreduced = true;
+                    //GTA.Native.Function.Call(GTA.Native.Hash.CLEAR_PED_LAST_WEAPON_DAMAGE, player);
                 }
-                if (armor > player.Armor)
+                if (armor > player.Armor && !GTA.Native.Function.Call<bool>(GTA.Native.Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, player, 0, 1))
                 {
                     isarmorreduced = true;
+                    //GTA.Native.Function.Call(GTA.Native.Hash.CLEAR_PED_LAST_WEAPON_DAMAGE, player);
                 }
-
+            } else { //Simple Detection
+                if (health > player.Health)
+                { ishealthreduced = true; }
+                if (armor > player.Armor)
+                { isarmorreduced = true; }
+            }
             //Randomize ragdoll times
-                if ((randomizehealthtime || randomizearmortime) && (ishealthreduced || isarmorreduced))
+            if ((randomizehealthtime || randomizearmortime) && (ishealthreduced || isarmorreduced))
                 {
                     if (randomizehealthtime && ishealthreduced)
                     {
